@@ -1,0 +1,656 @@
+<style>
+	div.dataTables_wrapper {
+        
+        margin: 0 auto;
+    }
+ 
+	div.pager {
+		margin: 1em 0;
+	}
+	
+	div.pager span {
+		display: inline-block;
+		width: 1.8em;
+		height: 1.8em;
+		line-height: 1.8;
+		text-align: center;
+		cursor: pointer;
+		background: #fff;
+		font-weight:bold;
+		margin-right: 0.5em;
+	}
+
+	thead tr
+        {
+            background-color: #1f419a ;
+            color: White;
+		
+        }	
+	thead tr th
+	{
+		padding-bottom: 40px;
+		max-width:300px;
+		vertical-align: middle;
+		word-wrap:break-word;
+		background-position: 85% 8px;
+		min-width: 100px; 
+	}
+	thead tr th select
+		{
+
+		margin-top:10px;
+		}
+	tbody tr td
+		{
+		text-align: center;
+		 
+		}
+        tr.odd
+        {
+            background-color: #ddd;
+        }
+ 	legend  {     
+			font-weight: 600;
+	    	color: #1f419a;
+		}
+     tr.even
+        {
+            background-color: #eee;
+        }
+
+      .hover
+        {
+            background-color: #5dd354;
+        }
+		
+       .page-number
+        {
+            color: blue; 
+            margin:2px 10px;
+            padding:2px 5px;
+        }
+        .active
+        {
+            border:solid 1px #CCC;
+            background-color:#76a7d2;
+			color: black;
+            }
+ 
+        .pager
+        {
+            margin-bottom:10px;
+            margin-left:20px;
+            }
+	    button.dt-button, div.dt-button, a.dt-button
+		{
+		font-size: 0.75em !important;
+		}
+		.fixedwidthBtn {width:0.5%;}
+	@media screen /*--This is for Print Preview Screen--*/
+	{
+
+		.display
+		{
+			background-color: ##CD853F;
+			border:1px solid green;
+		}
+	/* saf3+, chrome1+ */
+	@media screen and (-webkit-min-device-pixel-ratio:0) {
+		 /*your rules for chrome*/
+		.fixedwidthBtn {width:5%;}
+		table.display {
+		margin: 0 auto;
+		width: 100%;
+		clear: both;
+		border-collapse: collapse;
+		table-layout: fixed; 
+		word-wrap:break-word;  
+		}
+	}
+/* the firefox fix has to be below the chrome else it will not work */
+	@media(min--moz-device-pixel-ratio:0){
+
+		.fixedwidthBtn {width:2% !important;padding:0;}
+
+	}	 
+
+	}
+	td.view-control {
+		background: url('/qmresources/images/ui/view.png') no-repeat top center;
+		cursor: pointer;
+		background-position: center;	  
+		background-size: 16px;
+		text-decoration: none;
+		overflow: hidden;
+		text-indent: 100%;
+		white-space:nowrap;
+	}	 
+	td.edit-control {
+		background: url('/qmresources/images/ui/edit.png') no-repeat top center;
+		cursor: pointer;
+			background-position: center;	  
+			background-size: 16px;
+			text-decoration: none;
+			overflow: hidden;
+			text-indent: 100%;
+			white-space:nowrap;
+	}
+	 pre {
+	  font-family:Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	  font-size:14px;
+	  white-space:pre;
+	  word-wrap: break-word;
+	  white-space:-o-pre-wrap;
+	  white-space:-moz-pre-wrap;
+	  white-space:pre-wrap;
+	  margin-top:-1px;
+	 }
+	td
+		{
+			text-align: center;
+		}
+	.dataTables_filter
+		{
+			padding-bottom: 4px;
+		}
+	.cb-dropdown-wrap { 
+	  min-height: 35px;
+	  max-height: 25px;
+	  transition: max-height 0.20s ease;
+	  overflow-y: auto;
+	  overflow-x:hidden;
+	  border: 1px solid #888;
+	  position:absolute;
+	  z-index: 1;
+	  background-color: #fff;
+	  margin-top: -22px;
+	  margin-left:-10px;
+	  width:135px;
+	  -webkit-box-shadow: inset 0px 1px 4px #ECECEC;
+		border-radius: 5px;
+	}
+
+	.cb-dropdown-wrap:hover {  
+	  height: auto;
+	  max-height: 80px; /* At most, around 3/4 visible items. */
+	}
+
+	.cb-dropdown,
+	.cb-dropdown li {
+	  margin:0px 0px 10px 0px;
+	  padding: 2px;
+	  list-style: none;
+	  border-bottom: 1px solid #eee;
+	}
+
+	.cb-dropdown li label {
+	 /* padding: 3px 0;*/
+	  display: block;
+	  position: relative;
+	  cursor: pointer;
+	}
+
+	.cb-dropdown li label > input {
+	  position: absolute;
+	  right: 0;
+	  top: 0;
+	  width:15px;
+	}
+
+	.cb-dropdown li label > span {
+	  display: block;
+	/*  margin-left: 3px;*/
+	 /* margin-bottom:3px;*/
+	  margin-top: 0px !important;
+	/*  margin-right: 20px;*/ /* At least, width of the checkbox. */
+	  padding: 0px !important;
+	  font-family: sans-serif;
+	  font-size: 0.8em;
+	  font-weight: normal;
+	  text-align: left;
+	  width:110px;
+	}
+		 
+</style>
+<CFINCLUDE template="../../../../includes/datatable_include.cfm"/>
+      
+<script type="text/javascript">
+ 
+ 	
+	var getQueryString = function ( field, url ) {
+	var href = url ? url : window.location.href;
+	var reg = new RegExp( '[?&]' + field + '=([^&#]*)', 'i' );
+	var string = reg.exec(href);
+	return string ? string[1] : null;			
+	};
+	
+function getIns()
+	{
+		var nm=document.getElementById("insname").value;
+		var st=document.getElementById("state").value;
+		var ctry=document.getElementById("country").value;
+		var prg=$("#SelectedProgram").val();
+		alert(prg);
+		if (nm.length > 3 || st.length > 0 || (ctry.length>0 && ctry !='United States')|| parseInt(prg) >0)
+		{
+		
+		var insStorage = {};
+			$.get("/../institutions.cfc?method=getInstitutionArray&returnformat=json",{state:st,insname:nm,country:ctry,SelectedProgram:prg}).done(function(data) {
+								//var quesItem=data.split("],")
+								//   alert(JSON.parse(data).length);
+				//	var toScript(data,"data");
+				//var quesItem=JSON.parse(data);
+
+			insStorage = JSON.parse(data);
+			showInstitution(insStorage);
+		   // frmButton.prop('disabled', false);
+
+	     });
+			document.getElementById("insname").value=nm
+			document.getElementById("state").value=st;
+		 	document.getElementById("country").value=ctry;	document.getElementById("SelectedProgram").value=prg;
+		 //	$("#SelectedProgram").val()=prg;
+ 
+		}
+		else{
+			if(nm.length>0)
+				{
+					alert("Enter atleast 4 characters for institution");
+					document.getElementById("insname").focus();
+				}
+			else if (nm.length==0)
+				{
+					alert("Select either state/country (other than USA) or program or enter atlest 3 characters for institution");
+				}
+		}
+ 
+			 $(".ui-autocomplete").hide();
+
+	}
+  function buildDataTable(insTbl)
+{
+ 		
+$('#paginated').DataTable({
+		 
+    "dom": 'B<f<t>ip>',
+			buttons: [
+		{
+				extend: 'excel',
+				exportOptions: {
+				columns: [2,3,4,5,6],
+					format: {
+						header: function ( data, columnIdx ) {
+						if (columnIdx=== 2)
+						{return 'Institution' ;	}
+						if (columnIdx=== 3)
+						{return 'City' ;	}
+						if (columnIdx=== 4)
+						{return 'State' ;	}
+						if (columnIdx == 5)
+						{return 'Country' ;	}
+						if (columnIdx == 6)
+						{return 'Program' ;	}
+						}
+					}
+				}
+			},
+									 {
+				extend: 'pdf',
+				exportOptions: {
+					columns: [2,3,4,5,6],
+					format: {
+						header: function ( data, columnIdx ) {
+						if (columnIdx=== 2)
+						{return 'Institution' ;	}
+						if (columnIdx=== 3)
+						{return 'City' ;	}
+						if (columnIdx=== 4)
+						{return 'State' ;	}
+						if (columnIdx == 5)
+						{return 'Country' ;	}
+						if (columnIdx == 6)
+						{return 'Program' ;	}
+						}
+					}
+				}
+			},
+
+									 {
+				extend: 'print',
+				exportOptions: {
+					columns: [2,3,4,5,6],
+					format: {
+						header: function ( data, columnIdx ) {
+						if (columnIdx=== 2)
+						{return 'Institution' ;	}
+						if (columnIdx=== 3)
+						{return 'City' ;	}
+						if (columnIdx=== 4)
+						{return 'State' ;	}
+						if (columnIdx == 5)
+						{return 'Country' ;	}
+						if (columnIdx == 6)
+						{return 'Program' ;	}
+						}
+					}
+				}
+			}],
+	
+				
+       columnDefs: [
+    {bSortable: false, targets: [0,1,3,4,5,6]}  
+		   ],
+		
+		"order":[[2,"asc"]],
+		 "displayLength": 25,
+		scroller: {
+            loadingIndicator: true
+        },
+        "drawCallback": function ( settings ) {
+            var api = this.api();
+            var rows = api.rows( {page:'current'} ).nodes();
+            var last=null;
+ 
+        
+        },
+		
+		initComplete: function() {
+      this.api().columns().every(function() {
+        var column = this;
+		var cond=$(column.header()).text();
+		//  alert(cond.length);
+		if(cond.length >1  )
+		{
+		//	alert(cond);
+			if ( cond =='Program ') 
+			{
+			var ddmenu = cbDropdown($(column.header()).empty())
+			  .on('change', ':checkbox', function() {
+				var vals = $(':checked', ddmenu).map(function(index, element) {
+					//alert($(element).val());
+				  return $.fn.dataTable.util.escapeRegex($(element).val());
+				}).toArray().join('|');
+
+				column
+				  .search(vals.length > 0 ? '\W*(' + vals + ')\W*' : '', true, false)
+				  .draw();
+				  //console.log(vals);
+				//  alert(this.value);
+				  if(vals === ""){
+				  $(this).parent().parent().parent().removeClass("factive");
+				  }else{             $(this).parent().parent().parent().addClass("factive");
+				  }
+				  //change callback
+				 
+			  });
+				  
+		 	 
+			
+				//  var // wrapped
+//				$label = $('<label>'),
+//				$text = $('<span>', {
+//				  text: 'All Programs'
+//				}),
+//				$cb = $('<input>', {
+//				  type: 'checkbox',
+//				  value: '*',
+//				  checked:true
+//				});
+//
+//			  $text.appendTo($label);
+//			  $cb.appendTo($label);
+//
+//			  ddmenu.append($('<li>').append($label));	
+				
+				var // wrapped
+				$label = $('<label>'),
+				$text = $('<span>', {
+				  text: 'K-12'
+				}),
+				$cb = $('<input>', {
+				  type: 'checkbox',
+				  value: 'K-12',
+				  checked:true
+				});
+
+			  $text.appendTo($label);
+			  $cb.appendTo($label);
+
+			  ddmenu.append($('<li>').append($label));	
+				
+				var // wrapped
+				$label = $('<label>'),
+				$text = $('<span>', {
+				  text: 'K-12 Publisher'
+				}),
+				$cb = $('<input>', {
+				  type: 'checkbox',
+				  value: 'K-12 Publisher',
+				  checked:true
+				});
+
+			  $text.appendTo($label);
+			  $cb.appendTo($label);
+
+			  ddmenu.append($('<li>').append($label));
+				
+				var // wrapped
+				$label = $('<label>'),
+				$text = $('<span>', {
+				  text: 'Higher Ed'
+				}),
+				$cb = $('<input>', {
+				  type: 'checkbox',
+				  value: 'Higher Education',
+				  checked:true
+				});
+				$text.appendTo($label);
+				$cb.appendTo($label);
+				ddmenu.append($('<li>').append($label));
+				
+				var // wrapped
+				$label = $('<label>'),
+				$text = $('<span>', {
+				  text: 'Publisher'
+				}),
+				$cb = $('<input>', {
+				  type: 'checkbox',
+				  value: 'Publisher',
+				  checked:true
+				});
+
+				$text.appendTo($label);
+				$cb.appendTo($label);
+
+				ddmenu.append($('<li>').append($label));
+
+				var // wrapped
+				$label = $('<label>'),
+				$text = $('<span>', {
+				  text: 'CPE'
+				}),
+				$cb = $('<input>', {
+				  type: 'checkbox',
+				  value: 'CPE',
+				  checked:true
+				});
+
+				$text.appendTo($label);
+				$cb.appendTo($label);
+
+				ddmenu.append($('<li>').append($label));
+
+				
+				
+			 
+		} 
+		var loc=document.getElementsByClassName('dataTables_filter');
+				
+				if (cond.length > 1 && (cond=='Institution'))
+				{
+					//alert(cond);
+				     var select = $('<br/><select class="dtfilter" width="20px" id='+cond+' onChange="dtfilterChange(this);"><option value="">Select An Institution </option></select>')
+                    .appendTo( $(loc) )
+                    .on( 'change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+                            $(this).val()
+                        );
+ 						
+                        column
+                            .search( val ? '^'+val+'$' : '', true, false )
+                            .draw();
+						
+                    } );
+				
+                column.data().unique().sort().each( function ( d, j ) {
+					//alert(d);				
+                    select.append( '<option value="'+d+'">'+d+'</option>' )
+						
+				} );
+				}
+		if(cond=='City'||cond=='State' || cond=='Country' )
+			{
+				    var select = $('<select class="dtfilter" width="20px" id='+cond+' onChange="dtfilterChange(this);"><option value="">'+cond+'</option></select>')
+                    .appendTo($(column.header()).empty() )
+                    .on( 'change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+                            $(this).val()
+                        );
+ 						
+                        column
+                            .search( val ? '^'+val+'$' : '', true, false )
+                            .draw();
+						
+                    } );
+				
+                column.data().unique().sort().each( function ( d, j ) {
+					//alert(d);				
+                    select.append( '<option value="'+d+'">'+d+'</option>' )
+						
+				} );
+			}
+		
+		
+		}
+		  
+		  
+      });
+//$(".cb-dropdown-wrap").each(function(){
+//  	console.log($(this).parent().width());
+//  	$(this).width($(this).parent().width()+50);
+//  });
+		} });
+//	var data = table.buttons.exportData( {
+//    format: {
+//        header: function ( data, columnIdx ) {
+//            return columnIdx ;
+//        }
+//    }
+//} );
+		 
+	$('table.display').on('click', 'td.view-control', function () {
+  
+		var td=$(this).closest('td');
+		var ins=td.data('child-value');
+		var prg=getQueryString('program');
+		 
+		window.open("index.cfm?option=institution_view&program=0&id="+ins,"_self");
+		} );
+	$('table.display').on('click', 'td.edit-control', function () {
+  
+		var td=$(this).closest('td');
+		var ins=td.data('child-value');
+		var prg=getQueryString('program');
+		 
+		window.open("index.cfm?option=institution_edit&program=0&id="+ins,"_self");
+		} );
+	  
+		$('table.display').on("contextmenu", "td.edit-control", function(e){
+		 
+		var td=$(this).closest('td');
+		var ins=td.data('child-value');
+	 
+		window.open("index.cfm?option=institution_edit&program=0&id="+ins,"_blank");
+		 
+		});
+		$('table.display').on("contextmenu", "td.view-control", function(e){
+		
+		var td=$(this).closest('td');
+		var ins=td.data('child-value');
+		 
+			window.open("index.cfm?option=institution_view&program=0&id="+ins,"_blank");
+	 
+		});
+	}
+$(document).ready(function() {  
+       $( "#insname" ).autocomplete({
+			source: "../institutions.cfc?method=searchInsName&returnformat=json",
+			minLength:3,
+			select: function(event, ui) {
+				$('#institutionId').val(ui.item.id);
+				$('#insname').val(ui.item.label);
+				
+			} ,
+			change: function(event,ui){
+			
+			//$(this).val((ui.item ? ui.item.label : ""));
+			}
+     	});
+	 
+});
+$(document).keypress(function(event){
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if(keycode == '13'){
+        getIns();    
+		event.preventDefault();
+		return false;
+    }
+});
+function cbDropdown(column) {
+			return $('<ul>', {
+			  'class': 'cb-dropdown'
+			}).appendTo($('<div>', {
+			  'class': 'cb-dropdown-wrap'
+			}).appendTo(column)
+					   );
+  		}
+//function to remove query params form a url
+function addOrUpdateUrlParam(paramKey, paramVal) {
+	var uri=location.href;
+	var re = new RegExp("([?&])" + paramKey + "=[^&##]*", "i");
+	if (re.test(uri)) {
+	uri = uri.replace(re, '$1' + paramKey + "=" + paramVal);
+	} else {
+	var separator = /\?/.test(uri) ? "&" : "?";
+	uri = uri + separator + paramKey + "=" + paramVal;
+	}
+	return uri;
+}
+
+function replaceURLParameter(parameter) {
+    //prefer to use l.search if you have a location/link object
+	var url=window.location.href;
+    var urlparts= url.split('?');   
+    if (urlparts.length>=2) {
+
+        var prefix= encodeURIComponent(parameter)+'=';
+		 
+        var pars= urlparts[1].split(/[&;]/g);
+
+        //reverse iteration as may be destructive
+        for (var i= pars.length; i-- > 0;) {    
+            //idiom for string.startsWith
+            if (pars[i].lastIndexOf(prefix, 0) !== -1) { 
+				pars[i]=pars[i].replace("##tabs","");
+            }
+        }
+
+        url= urlparts[0] + (pars.length > 0 ? '?' + pars.join('&') : "");
+		//alert(url);
+		 //window.history.pushState({path:url},'',url);
+       return url;
+    } else {
+		//window.history.pushState({path:url},'',url);
+        return url;
+    }
+}	
